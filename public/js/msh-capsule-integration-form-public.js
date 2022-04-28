@@ -49,6 +49,7 @@
 		}; //$(this).serialze();
 
 		const submitButton = $(this).find("button[type=submit]");
+		const submitButtonText = $(submitButton).html();
 
 		jQuery.ajax({
 			type: "post",
@@ -57,11 +58,13 @@
 			data: formData,
 			beforeSend: function() {
 				$(submitButton).addClass("loading");
+				$(submitButton).html("Processing...")
 			},
 			success: function(response){
 				console.log(response);
 				
 				$(submitButton).removeClass("loading");
+				$(submitButton).html(submitButtonText)
 
 				if ( response["data"]['successful_message'] ) {
 					alert( response["data"]['successful_message'] );
