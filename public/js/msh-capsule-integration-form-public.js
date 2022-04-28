@@ -51,6 +51,8 @@
 		const submitButton = $(this).find("button[type=submit]");
 		const submitButtonText = $(submitButton).html();
 
+		$(submitButton).prop("disabled", true);
+
 		jQuery.ajax({
 			type: "post",
 			dataType: "json",
@@ -58,10 +60,11 @@
 			data: formData,
 			beforeSend: function() {
 				$(submitButton).addClass("loading");
-				$(submitButton).html("Processing...")
+				$(submitButton).html("Processing...");
 			},
 			success: function(response){
 				console.log(response);
+				$(submitButton).prop("disabled", false);
 				
 				$(submitButton).removeClass("loading");
 				$(submitButton).html(submitButtonText)
