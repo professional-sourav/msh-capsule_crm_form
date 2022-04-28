@@ -17,13 +17,14 @@
 class Msh_Capsule_Crm {
 
 	protected $url;
-	protected $token;
+
+    protected $settings;
 	
 	public function __construct() {
 		
         $this->url = "https://api.capsulecrm.com/api/v2/parties";
 
-        $this->token = "zJMHIO3iK3mieK7OAHhYOL/gHBZlW3OeQK7wH9alsBwlAY2B1gNWNUAuopKZv6dY";
+        $this->settings = get_option( 'capsule_crm_form_option_name' );
 	}
 
     public function add_parties( $post_data_arr ) {
@@ -42,7 +43,7 @@ class Msh_Capsule_Crm {
 		$header = array(
 			'Content-Type' 			=> 'application/json; charset=utf-8', 
 			'Accept' 				=> 'application/json',
-			'Authorization'			=>'Bearer ' . $this->token
+			'Authorization'			=>'Bearer ' . $this->settings['msh_cif_settings_token']
 		);
 	
 		$args = array(
@@ -58,6 +59,11 @@ class Msh_Capsule_Crm {
 	
 		$response = wp_remote_post($this->url, $args);
 
-		return wp_remote_retrieve_body($response);
+		$response_body = wp_remote_retrieve_body($response);
+
+        return [
+            "response" => $response_body,
+            "successful_message" => $this->settings["msh_cif_settings_after_successfull_submit_message"]
+        ];
     }
 }

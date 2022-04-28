@@ -124,12 +124,12 @@ class Msh_Capsule_Integration_Form_Public {
 		return $output;
 	}
 
-	
+
 	public function mshcp_form_submit_callback() {
 
 		$capsuleCRM = new Msh_Capsule_Crm();
 		$response 	= $capsuleCRM->add_parties( $_POST['data'] );
 
-		die( $response );
+		return wp_send_json_success($response);
 	}
 }

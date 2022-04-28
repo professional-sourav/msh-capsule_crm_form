@@ -40,6 +40,8 @@ class Msh_Capsule_Integration_Form_Admin {
 	 */
 	private $version;
 
+	private $capsule_crm_form_options;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -52,6 +54,8 @@ class Msh_Capsule_Integration_Form_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+		add_action( 'admin_menu', array( $this, 'capsule_crm_form_add_plugin_page' ) );
+		add_action( 'admin_init', array( $this, 'capsule_crm_form_page_init' ) );
 	}
 
 	/**
@@ -100,4 +104,87 @@ class Msh_Capsule_Integration_Form_Admin {
 
 	}
 
+
+	public function capsule_crm_form_add_plugin_page() {
+		add_menu_page(
+			'Capsule CRM Form', // page_title
+			'Capsule CRM Form', // menu_title
+			'manage_options', // capability
+			'capsule-crm-form', // menu_slug
+			array( $this, 'capsule_crm_form_create_admin_page' ), // function
+			'dashicons-admin-generic', // icon_url
+			2 // position
+		);
+	}
+
+	public function capsule_crm_form_create_admin_page() {
+
+		$this->capsule_crm_form_options = get_option( 'capsule_crm_form_option_name' );		
+
+		include_once plugin_dir_path(__FILE__) .  "/partials/msh-capsule-settings-page.php";
+	}
+
+	public function capsule_crm_form_page_init() {
+
+		register_setting(
+			'capsule_crm_form_option_group', // option_group
+			'capsule_crm_form_option_name', // option_name
+			array( $this, 'capsule_crm_form_sanitize' ) // sanitize_callback
+		);
+
+		add_settings_section(
+			'capsule_crm_form_setting_section', // id
+			'Settings', // title
+			array( $this, 'capsule_crm_form_section_info' ), // callback
+			'capsule-crm-form-admin' // page
+		);
+
+		add_settings_field(
+			'api_token_0', // id
+			'API Token', // title
+			array( $this, 'settings_token_callback' ), // callback
+			'capsule-crm-form-admin', // page
+			'capsule_crm_form_setting_section' // section
+		);
+
+		add_settings_field(
+			'message_to_be_display_after_successfull_submission_1', // id
+			'Message to be display after successfull submission', // title
+			array( $this, 'settings_message_to_be_display_after_successfull_submission_callback' ), // callback
+			'capsule-crm-form-admin', // page
+			'capsule_crm_form_setting_section' // section
+		);
+	}
+
+	public function capsule_crm_form_sanitize($input) {
+
+		$sanitary_values = array();
+		if ( isset( $input['msh_cif_settings_token'] ) ) {
+			$sanitary_values['msh_cif_settings_token'] = sanitize_text_field( $input['msh_cif_settings_token'] );
+		}
+
+		if ( isset( $input['msh_cif_settings_after_successfull_submit_message'] ) ) {
+			$sanitary_values['msh_cif_settings_after_successfull_submit_message'] = esc_textarea( $input['msh_cif_settings_after_successfull_submit_message'] );
+		}
+
+		return $sanitary_values;
+	}
+
+	public function capsule_crm_form_section_info() {
+		
+	}
+
+	public function settings_token_callback() {
+		printf(
+			'<input class="regular-text" type="text" name="capsule_crm_form_option_name[msh_cif_settings_token]" id="msh_cif_settings_token" value="%s">',
+			isset( $this->capsule_crm_form_options['msh_cif_settings_token'] ) ? esc_attr( $this->capsule_crm_form_options['msh_cif_settings_token']) : ''
+		);
+	}
+
+	public function settings_message_to_be_display_after_successfull_submission_callback() {
+		printf(
+			'<textarea class="large-text" rows="5" name="capsule_crm_form_option_name[msh_cif_settings_after_successfull_submit_message]" id="msh_cif_settings_after_successfull_submit_message">%s</textarea>',
+			isset( $this->capsule_crm_form_options['msh_cif_settings_after_successfull_submit_message'] ) ? esc_attr( $this->capsule_crm_form_options['msh_cif_settings_after_successfull_submit_message']) : ''
+		);
+	}
 }

@@ -58,10 +58,14 @@
 			beforeSend: function() {
 				$(submitButton).addClass("loading");
 			},
-			success: function(msg){
-				console.log(msg);
+			success: function(response){
+				console.log(response);
 				
 				$(submitButton).removeClass("loading");
+
+				if ( response["data"]['successful_message'] ) {
+					alert( response["data"]['successful_message'] );
+				}
 			}
 		});
 	});
