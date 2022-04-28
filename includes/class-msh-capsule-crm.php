@@ -34,7 +34,7 @@ class Msh_Capsule_Crm {
 		$data["party"]["firstName"] 		= $post_data_arr["first_name"];
 		$data["party"]["lastName"] 			= $post_data_arr["last_name"];
 		$data["party"]["jobTitle"] 			= $post_data_arr["interested_in"];
-		// $data["party"]["organisation"] 		= $post_data_arr["company"];
+		$data["party"]["organisation"] 		= [ "name" => $post_data_arr["company"] ];
 		$data["party"]["phoneNumbers"] 		= [ ["type" => null, "number" => $post_data_arr["phone_number"]] ];
 		$data["party"]["emailAddresses"]	= [ ["type" => "Work", "address" => $post_data_arr["email"]] ];
 
