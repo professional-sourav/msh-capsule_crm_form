@@ -112,6 +112,11 @@ class Msh_Capsule_Integration_Form {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-msh-capsule-integration-form-i18n.php';
 
 		/**
+		 * Load the Capsule CRM core file
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-msh-capsule-crm.php';
+
+		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-msh-capsule-integration-form-admin.php';
