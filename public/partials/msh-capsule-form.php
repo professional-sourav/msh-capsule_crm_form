@@ -1,6 +1,8 @@
 <div id="msh-capsule-integration-form">
 
     <form role="form" method="POST" id="mshcp_form">
+
+        <?php wp_nonce_field( 'mshcp_form_submit_callback', 'mshcp_form_submit_nonce' ); ?>
         
         <!-- First Name -->
         <div class="mshcp-form-group">

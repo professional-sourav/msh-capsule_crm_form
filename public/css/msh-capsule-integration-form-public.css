@@ -27,4 +27,17 @@
   #msh-capsule-integration-form > #mshcp_form input[type=submit]:hover, button {
     background-color: #45a049;
   }
+
+  #mshcp_form_submit_success h5 {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    text-transform: none !important;
+  }
+  #mshcp_form_submit_success h5 .success-submit-icon {
+
+    width: 32px;
+    height: 32px;
+    margin-right: 15px;
+  }
   

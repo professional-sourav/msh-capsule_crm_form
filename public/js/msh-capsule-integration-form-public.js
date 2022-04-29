@@ -69,8 +69,16 @@
 				$(submitButton).removeClass("loading");
 				$(submitButton).html(submitButtonText)
 
-				if ( response["data"]['successful_message'] ) {
-					alert( response["data"]['successful_message'] );
+				// display the success message and remove the form from the page
+				if ( response["data"]['successful_message_html'] ) {
+					
+					$("#msh-capsule-integration-form").html( response["data"]['successful_message_html'] );
+				}
+
+				// download
+				if ( response["data"]['redirect_url'] ) {
+
+					location.href = response["data"]['redirect_url'];
 				}
 			}
 		});

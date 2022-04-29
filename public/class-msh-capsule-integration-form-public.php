@@ -40,6 +40,8 @@ class Msh_Capsule_Integration_Form_Public {
 	 */
 	private $version;
 
+	private $resource_download_url;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -51,6 +53,8 @@ class Msh_Capsule_Integration_Form_Public {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+
+		$this->resource_download_url = "%s?msh_cif_resources_download=true&token=%s";
 
 		add_shortcode( 'MSHCapsule_Form', [ $this, 'init_capsule_form_callback' ] );
 
@@ -113,6 +117,8 @@ class Msh_Capsule_Integration_Form_Public {
 
 	public function init_capsule_form_callback() {
 
+		$response['data']['successful_message'] = "Successfull";
+
 		ob_start();
 
 		include_once plugin_dir_path(__FILE__) .  "/partials/msh-capsule-form.php";
@@ -127,9 +133,89 @@ class Msh_Capsule_Integration_Form_Public {
 
 	public function mshcp_form_submit_callback() {
 
+		$response = [];
+
+		// if (wp_verify_nonce( $_POST[ 'mshcp_form_submit_nonce' ], 'mshcp_form_submit_callback' )) {
+
+			
+
+		// }
+
+		// send data to the CRM
 		$capsuleCRM = new Msh_Capsule_Crm();
 		$response 	= $capsuleCRM->add_parties( $_POST['data'] );
+		
+		// generate the success HTML
+		ob_start();
+			
+		include_once plugin_dir_path(__FILE__) .  "/partials/msh-capsule-form-submit-success.php";
+
+		$response['successful_message_html'] = ob_get_contents();
+
+		ob_clean();
+
+		// download the resource
+		$download_file_url = $this->upload_resource_to_media();
+
+		// prepare response for the ajax success
+		$response['redirect_url'] = sprintf(
+			$this->resource_download_url,
+			home_url(),
+			base64_encode( $download_file_url )
+		); 
 
 		return wp_send_json_success($response);
 	}
+
+
+	private function upload_resource_to_media() {
+
+		$file 			= plugin_dir_path(__FILE__) . "Xampla White Paper January 2022.pdf";
+		$filename 		= basename($file);
+		$attachment_id 	= get_option( "msh_capsule_integration_form_media_post_id" );
+		$attachment_url	= wp_get_attachment_url($attachment_id);
+
+		if ( !empty($attachment_url) ) {
+
+			$download_file_url = $attachment_url;
+
+		} else {
+
+			$upload_file = wp_upload_bits($filename, null, file_get_contents($file));
+
+			if (!$upload_file['error']) {
+
+				$wp_filetype = wp_check_filetype($filename, null );
+
+				$attachment = array(
+					'post_mime_type' => $wp_filetype['type'],
+					'post_title' => preg_replace('/\.[^.]+$/', '', $filename),
+					'post_content' => '',
+					'post_status' => 'inherit'
+				);
+
+				$attachment_id = wp_insert_attachment( $attachment, $upload_file['file'] );
+
+				if (!is_wp_error($attachment_id)) {
+
+					require_once(ABSPATH . "wp-admin" . '/includes/image.php');
+
+					$attachment_data = wp_generate_attachment_metadata( $attachment_id, $upload_file['file'] );
+
+					wp_update_attachment_metadata( $attachment_id,  $attachment_data );
+
+					update_option( "msh_capsule_integration_form_media_post_id", $attachment_id );
+
+					$download_file_url	= wp_get_attachment_url($attachment_id);
+				}			
+			}
+		}
+
+		if ( !empty( $download_file_url ) ) {
+
+			return $download_file_url;
+		}
+
+		return false;
+	}	
 }

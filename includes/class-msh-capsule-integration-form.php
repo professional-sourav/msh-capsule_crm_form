@@ -79,6 +79,7 @@ class Msh_Capsule_Integration_Form {
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 
+		$this->init();
 	}
 
 	/**
@@ -220,4 +221,29 @@ class Msh_Capsule_Integration_Form {
 		return $this->version;
 	}
 
+	public function init() {
+
+		/**
+		 * Download the resource if requested
+		 */
+		if ( !empty( $_GET['msh_cif_resources_download'] ) ) {
+
+			$this->download_resource();
+		}
+	}
+
+
+
+	private function download_resource() {
+
+		$download_resource_url = base64_decode( $_GET['token'] );
+
+			// We'll be outputting a PDF
+			header('Content-type: application/pdf');
+
+			// Set filename of download
+			header('Content-Disposition: attachment; filename="'. basename( $download_resource_url ) .'"');
+
+			readfile($download_resource_url);
+	}
 }
