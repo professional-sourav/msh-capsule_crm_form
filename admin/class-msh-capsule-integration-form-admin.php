@@ -119,7 +119,9 @@ class Msh_Capsule_Integration_Form_Admin {
 
 	public function capsule_crm_form_create_admin_page() {
 
-		$this->capsule_crm_form_options = get_option( 'capsule_crm_form_option_name' );		
+		$this->capsule_crm_form_options = get_option( 'capsule_crm_form_option_name' );	
+		
+		// print_r($this->capsule_crm_form_options); die;
 
 		include_once plugin_dir_path(__FILE__) .  "/partials/msh-capsule-settings-page.php";
 	}
@@ -182,9 +184,31 @@ class Msh_Capsule_Integration_Form_Admin {
 	}
 
 	public function settings_message_to_be_display_after_successfull_submission_callback() {
-		printf(
-			'<textarea class="large-text" rows="5" name="capsule_crm_form_option_name[msh_cif_settings_after_successfull_submit_message]" id="msh_cif_settings_after_successfull_submit_message">%s</textarea>',
-			isset( $this->capsule_crm_form_options['msh_cif_settings_after_successfull_submit_message'] ) ? esc_attr( $this->capsule_crm_form_options['msh_cif_settings_after_successfull_submit_message']) : ''
+
+		// printf(
+		// 	'<textarea class="large-text" rows="5" name="capsule_crm_form_option_name[msh_cif_settings_after_successfull_submit_message]" id="msh_cif_settings_after_successfull_submit_message">%s</textarea>',
+		// 	isset( $this->capsule_crm_form_options['msh_cif_settings_after_successfull_submit_message'] ) ? esc_attr( $this->capsule_crm_form_options['msh_cif_settings_after_successfull_submit_message']) : ''
+		// );
+
+		// $settings = array( 'textarea_name' => 'capsule_crm_form_option_name[msh_cif_settings_after_successfull_submit_message]' );
+
+		// wp_editor( "", "msh_cif_settings_after_successfull_submit_message", [] );
+
+		// wp_editor( "", null, "" );
+
+		$options = get_option( 'capsule_crm_form_option_name' );
+
+		$content = isset( $options['msh_cif_settings_after_successfull_submit_message'] ) 
+		?  html_entity_decode($options['msh_cif_settings_after_successfull_submit_message']) 
+		: false;
+
+		wp_editor( 
+			$content, 
+			'msh_cif_settings_after_successfull_submit_message', 
+			array( 
+				'textarea_name' => 'capsule_crm_form_option_name[msh_cif_settings_after_successfull_submit_message]',
+				'media_buttons' => false,			
+			) 
 		);
 	}
 }

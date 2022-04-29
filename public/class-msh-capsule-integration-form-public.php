@@ -154,68 +154,69 @@ class Msh_Capsule_Integration_Form_Public {
 
 		ob_clean();
 
+		/*  For auto download, enable the below codes */
 		// download the resource
-		$download_file_url = $this->upload_resource_to_media();
+		// $download_file_url = $this->upload_resource_to_media();
 
 		// prepare response for the ajax success
-		$response['redirect_url'] = sprintf(
-			$this->resource_download_url,
-			home_url(),
-			base64_encode( $download_file_url )
-		); 
+		// $response['redirect_url'] = sprintf(
+		// 	$this->resource_download_url,
+		// 	home_url(),
+		// 	base64_encode( $download_file_url )
+		// ); 
 
 		return wp_send_json_success($response);
 	}
 
 
-	private function upload_resource_to_media() {
+	// private function upload_resource_to_media() {
 
-		$file 			= plugin_dir_path(__FILE__) . "Xampla White Paper January 2022.pdf";
-		$filename 		= basename($file);
-		$attachment_id 	= get_option( "msh_capsule_integration_form_media_post_id" );
-		$attachment_url	= wp_get_attachment_url($attachment_id);
+	// 	$file 			= plugin_dir_path(__FILE__) . "Xampla White Paper January 2022.pdf";
+	// 	$filename 		= basename($file);
+	// 	$attachment_id 	= get_option( "msh_capsule_integration_form_media_post_id" );
+	// 	$attachment_url	= wp_get_attachment_url($attachment_id);
 
-		if ( !empty($attachment_url) ) {
+	// 	if ( !empty($attachment_url) ) {
 
-			$download_file_url = $attachment_url;
+	// 		$download_file_url = $attachment_url;
 
-		} else {
+	// 	} else {
 
-			$upload_file = wp_upload_bits($filename, null, file_get_contents($file));
+	// 		$upload_file = wp_upload_bits($filename, null, file_get_contents($file));
 
-			if (!$upload_file['error']) {
+	// 		if (!$upload_file['error']) {
 
-				$wp_filetype = wp_check_filetype($filename, null );
+	// 			$wp_filetype = wp_check_filetype($filename, null );
 
-				$attachment = array(
-					'post_mime_type' => $wp_filetype['type'],
-					'post_title' => preg_replace('/\.[^.]+$/', '', $filename),
-					'post_content' => '',
-					'post_status' => 'inherit'
-				);
+	// 			$attachment = array(
+	// 				'post_mime_type' => $wp_filetype['type'],
+	// 				'post_title' => preg_replace('/\.[^.]+$/', '', $filename),
+	// 				'post_content' => '',
+	// 				'post_status' => 'inherit'
+	// 			);
 
-				$attachment_id = wp_insert_attachment( $attachment, $upload_file['file'] );
+	// 			$attachment_id = wp_insert_attachment( $attachment, $upload_file['file'] );
 
-				if (!is_wp_error($attachment_id)) {
+	// 			if (!is_wp_error($attachment_id)) {
 
-					require_once(ABSPATH . "wp-admin" . '/includes/image.php');
+	// 				require_once(ABSPATH . "wp-admin" . '/includes/image.php');
 
-					$attachment_data = wp_generate_attachment_metadata( $attachment_id, $upload_file['file'] );
+	// 				$attachment_data = wp_generate_attachment_metadata( $attachment_id, $upload_file['file'] );
 
-					wp_update_attachment_metadata( $attachment_id,  $attachment_data );
+	// 				wp_update_attachment_metadata( $attachment_id,  $attachment_data );
 
-					update_option( "msh_capsule_integration_form_media_post_id", $attachment_id );
+	// 				update_option( "msh_capsule_integration_form_media_post_id", $attachment_id );
 
-					$download_file_url	= wp_get_attachment_url($attachment_id);
-				}			
-			}
-		}
+	// 				$download_file_url	= wp_get_attachment_url($attachment_id);
+	// 			}			
+	// 		}
+	// 	}
 
-		if ( !empty( $download_file_url ) ) {
+	// 	if ( !empty( $download_file_url ) ) {
 
-			return $download_file_url;
-		}
+	// 		return $download_file_url;
+	// 	}
 
-		return false;
-	}	
+	// 	return false;
+	// }	
 }
