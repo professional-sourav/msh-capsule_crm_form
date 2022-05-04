@@ -56,6 +56,9 @@ class Msh_Capsule_Integration_Form_Admin {
 
 		add_action( 'admin_menu', array( $this, 'capsule_crm_form_add_plugin_page' ) );
 		add_action( 'admin_init', array( $this, 'capsule_crm_form_page_init' ) );
+
+		add_action('wp_ajax_msh_cif_settings_remove_attachment_callback', [ $this, 'msh_cif_settings_remove_attachment_callback' ]); // wp_ajax_{ACTION HERE} 
+		add_action('wp_ajax_nopriv_msh_cif_settings_remove_attachment_callback', [ $this, 'msh_cif_settings_remove_attachment_callback' ]);		
 	}
 
 	/**
@@ -100,8 +103,15 @@ class Msh_Capsule_Integration_Form_Admin {
 		 * class.
 		 */
 
+		wp_enqueue_media();
+
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/msh-capsule-integration-form-admin.js', array( 'jquery' ), $this->version, false );
 
+		wp_localize_script( 
+			$this->plugin_name, 
+			sprintf( "%s_%s", str_replace( "-", "_", $this->plugin_name ), "ajax" ), 
+			array( 'ajaxurl' => admin_url( 'admin-ajax.php' ))
+		);
 	}
 
 
@@ -156,9 +166,19 @@ class Msh_Capsule_Integration_Form_Admin {
 			'capsule-crm-form-admin', // page
 			'capsule_crm_form_setting_section' // section
 		);
+
+		add_settings_field(
+			"capsule_crm_form_setting_pdf_upload", 
+			"Upload PDFs", 
+			array( $this, 'capsule_crm_form_section_pdf_upload' ), 
+			"capsule-crm-form-admin", 
+			"capsule_crm_form_setting_section"
+		);  
 	}
 
 	public function capsule_crm_form_sanitize($input) {
+
+		// print_r($input); echo "<pre>'"; die;
 
 		$sanitary_values = array();
 		if ( isset( $input['msh_cif_settings_token'] ) ) {
@@ -167,6 +187,10 @@ class Msh_Capsule_Integration_Form_Admin {
 
 		if ( isset( $input['msh_cif_settings_after_successfull_submit_message'] ) ) {
 			$sanitary_values['msh_cif_settings_after_successfull_submit_message'] = esc_textarea( $input['msh_cif_settings_after_successfull_submit_message'] );
+		}
+
+		if ( isset( $input['attachment_ids'] ) ) {
+			$sanitary_values['attachment_ids'] = sanitize_text_field( $input['attachment_ids'] );
 		}
 
 		return $sanitary_values;
@@ -185,17 +209,6 @@ class Msh_Capsule_Integration_Form_Admin {
 
 	public function settings_message_to_be_display_after_successfull_submission_callback() {
 
-		// printf(
-		// 	'<textarea class="large-text" rows="5" name="capsule_crm_form_option_name[msh_cif_settings_after_successfull_submit_message]" id="msh_cif_settings_after_successfull_submit_message">%s</textarea>',
-		// 	isset( $this->capsule_crm_form_options['msh_cif_settings_after_successfull_submit_message'] ) ? esc_attr( $this->capsule_crm_form_options['msh_cif_settings_after_successfull_submit_message']) : ''
-		// );
-
-		// $settings = array( 'textarea_name' => 'capsule_crm_form_option_name[msh_cif_settings_after_successfull_submit_message]' );
-
-		// wp_editor( "", "msh_cif_settings_after_successfull_submit_message", [] );
-
-		// wp_editor( "", null, "" );
-
 		$options = get_option( 'capsule_crm_form_option_name' );
 
 		$content = isset( $options['msh_cif_settings_after_successfull_submit_message'] ) 
@@ -210,5 +223,67 @@ class Msh_Capsule_Integration_Form_Admin {
 				'media_buttons' => false,			
 			) 
 		);
+	}
+
+	public function capsule_crm_form_section_pdf_upload() {
+
+		if ( !empty( $this->capsule_crm_form_options['attachment_ids'] ) ) {
+
+			$attachment_id_str = $this->capsule_crm_form_options['attachment_ids'];
+			$attachment_id_arr = explode( ",", $attachment_id_str );
+			$html = "<ul id='msh_cif_settings_attachments'>";
+			$id_str = "";
+
+			foreach ( $attachment_id_arr as $attachment_id ) {
+
+				if ( wp_get_attachment_image( $attachment_id ) ) {
+
+					$id_str .= $attachment_id . ",";
+
+					$html .= '<li>
+						<div class="msh-cif-settings-attachment-overlay"></div>
+						<button type="button" class="msh_cif_settings_attachment_remove" data-attachment-id="'. $attachment_id .'">Remove</button>
+						'. wp_get_attachment_image( $attachment_id ) .'
+					</li>';
+				}
+			}
+
+			$html .= '<input type="hidden" id="_hidden_capsule_crm_form_option_name_attachment_ids" name="capsule_crm_form_option_name[attachment_ids]" value="'. rtrim($id_str, ",") .'" />';
+
+			$html .= "</ul>";
+
+			echo $html;
+		}
+	}
+
+
+	public function msh_cif_settings_remove_attachment_callback() {
+
+		$this->capsule_crm_form_options = get_option( 'capsule_crm_form_option_name' );	
+
+		if ( !empty( $_POST["data"]["attachment_id"] ) ) {
+
+			$attachment_ids = $this->capsule_crm_form_options['attachment_ids'];
+			$attachment_ids_arr = explode(",", $attachment_ids);
+
+			if (($key = array_search($_POST["data"]["attachment_id"], $attachment_ids_arr)) !== false) {
+				unset($attachment_ids_arr[$key]);
+			}
+
+			$this->capsule_crm_form_options['attachment_ids'] = trim( implode( ",", $attachment_ids_arr ), ",");
+
+			// echo "<pre>" . print_r($this->capsule_crm_form_options); die;
+
+			update_option( "capsule_crm_form_option_name", $this->capsule_crm_form_options );
+
+			// if ( wp_delete_attachment( intval( $_POST["data"]["attachment_id"] ) ) )
+			// 	return wp_send_json_success([
+			// 		"message"	=> __("The attachment has been deleted successfully!", $this->plugin_name)
+			// 	]);
+		}
+
+		return wp_send_json_error([
+			"message"	=> __("Something is wrong! Please try after sometime", $this->plugin_name)
+		]);
 	}
 }
