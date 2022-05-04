@@ -127,7 +127,18 @@
 						`<input type="hidden" id="_hidden_capsule_crm_form_option_name_attachment_ids" name="capsule_crm_form_option_name[attachment_ids]" value="${attachment_ids}" />`
 					);
 
-				$(button_upload).after(`<p>${file_names.join(", ").toString()}</p>`);
+
+				let html = "<ul class='msh-capsule-selected-files'>";
+
+				$.each(file_names, function (index, file_name) {
+
+					html += `<li>${file_name}</li>`;
+				});
+
+				html += "</ul>";
+
+				// $(button_upload).after(`<ul>${file_names.join("").toString()}</ul>`);
+				$(button_upload).after( html );
 		   });
 		});
 

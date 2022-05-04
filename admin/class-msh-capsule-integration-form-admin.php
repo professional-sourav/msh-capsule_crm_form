@@ -263,23 +263,24 @@ class Msh_Capsule_Integration_Form_Admin {
 
 		if ( !empty( $_POST["data"]["attachment_id"] ) ) {
 
-			$attachment_ids = $this->capsule_crm_form_options['attachment_ids'];
+			$attachment_ids 	= $this->capsule_crm_form_options['attachment_ids'];
 			$attachment_ids_arr = explode(",", $attachment_ids);
 
+			/* Remove the attachment id from the option */
 			if (($key = array_search($_POST["data"]["attachment_id"], $attachment_ids_arr)) !== false) {
 				unset($attachment_ids_arr[$key]);
 			}
 
 			$this->capsule_crm_form_options['attachment_ids'] = trim( implode( ",", $attachment_ids_arr ), ",");
 
-			// echo "<pre>" . print_r($this->capsule_crm_form_options); die;
-
 			update_option( "capsule_crm_form_option_name", $this->capsule_crm_form_options );
 
-			// if ( wp_delete_attachment( intval( $_POST["data"]["attachment_id"] ) ) )
-			// 	return wp_send_json_success([
-			// 		"message"	=> __("The attachment has been deleted successfully!", $this->plugin_name)
-			// 	]);
+			/* Delete the file from the media, as well */
+			// wp_delete_attachment( intval( $_POST["data"]["attachment_id"]
+			
+			return wp_send_json_success([
+				"message"	=> __("The attachment has been removed successfully!", $this->plugin_name)
+			]);
 		}
 
 		return wp_send_json_error([

@@ -32,3 +32,17 @@
     top: 0;
     right: 0;
  }
+
+ul.msh-capsule-selected-files {
+
+   display: flex;
+   justify-content: flex-start;
+   align-items: center;
+ }
+ ul.msh-capsule-selected-files > li {
+
+   background: #fff;
+   margin-right: 15px;
+   padding: 0.5rem;
+   border-radius: 5px;
+ }
