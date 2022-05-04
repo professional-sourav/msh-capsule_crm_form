@@ -49,11 +49,14 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+    position: relative;
   }
 
   #mshcp_form_after_submit_attachments ul.mshcp-list-attachments > li {
     
     border: 2px solid #000;
+    position: relative;
+    padding: 0 !important;
   }
   #mshcp_form_after_submit_attachments ul.mshcp-list-attachments > li:not( :nth-child(1) ) {
     /* grid-column-start: 1;
@@ -63,4 +66,15 @@
     /* display: grid;
     grid-template-columns: subgrid; */
     margin: 1rem;
+  }
+  #mshcp_form_after_submit_attachments ul.mshcp-list-attachments > li .mshcp-button-download {
+    
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
