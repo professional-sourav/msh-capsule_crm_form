@@ -30,11 +30,11 @@ if ( !empty( $capsule_crm_form_options["attachment_ids"] ) ):
             ?>
                 <li>
                     <a href="<?php echo $attachment_download_url ?>"
-                    alt="<?php echo __("Download the PDF", $this->plugin_name) ?>"
-                    title="<?php echo __("Download the PDF", $this->plugin_name) ?>"
-                    class="mshcp-button-download" 
-                    data-attachment-id="<?php echo $attachment_id ?>"
-                    target="_blank">
+                        alt="<?php echo __("Download the PDF", $this->plugin_name) ?>"
+                        title="<?php echo __("Download the PDF", $this->plugin_name) ?>"
+                        class="mshcp-button-download" 
+                        data-attachment-id="<?php echo $attachment_id ?>"
+                        target="_blank">
                         <img src="<?php echo plugin_dir_url(__FILE__) . '../images/download-24.png' ?>">
                     </a>
                     <?php echo $attachment ?>
